@@ -1,0 +1,116 @@
+<%- include ('../partials/header'); %>
+    <section class="row m-0">
+        <div class="vh-90 mt-4 col-md-10 offset-md-1 col-lg-6 offset-lg-3 align-self-center">
+            <form action="/tickets/new" class="bg-white p-3 rounded-3 border-3 g-3 needs-validation align-self-center" novalidate method="post" id="logTicket">
+                <%- include ('../partials/vaImage'); %>
+                <h2 class="h2 mb-3 text-center">Welcome to Ticket Tracker</h2>
+                <div class="row align-items-center p-3 ">
+                  <div class="col-md-3 text-end text-sm-start text-lg-end">
+                    <label for="ticketNumber" class="form-label fw-bold ">Ticket Number: </label>
+                  </div>
+                  <div class="col-md-7">
+                    <input type="text" class="form-control" id="ticketNumber" name="ticketNumber" required>
+                    <div class="valid-feedback">
+                      Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                      Please provide serial number.
+                    </div>
+                  </div>
+                </div>
+                <div class="row align-items-center p-3 ">
+                  <div class="col-md-3 text-end text-sm-start text-lg-end">
+                    <label for="customer" class="form-label fw-bold">Customer: </label>
+                  </div>
+                  <div class="col-md-7">
+                    <input type="text" class="form-control" id="customer" name="customer" required>
+                    <div class="valid-feedback">
+                      Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                      Please provide name of customer.
+                    </div>
+                  </div>
+                </div>
+                <div class="row align-items-center p-3 ">
+                    <div class="col-md-3 text-end text-sm-start text-lg-end">
+                      <label for="customer" class="form-label fw-bold">Request: </label>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="request" name="request" disabled>
+                      <div class="valid-feedback">
+                        Looks good!
+                      </div>
+                      <div class="invalid-feedback">
+                        Which kind of ticket is this: 
+                        <ul>
+                            <li>Configuration Request</li>
+                            <li>Question</li>
+                            <li>Monitor / Activator</li>
+                            <li>etc.</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="col-md-1 my-md-auto mt-sm-2">
+                        <a tabindex="0" class="btn btn-warning" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="Before you proceed:" data-bs-content="If its not an RMA, define which type of ticket it is: Configuration request, Question, Monitor / Activator, etc.">
+                            <i class="fas fa-question-circle text-white" id="requestBtn"></i>
+                        </a>
+                    </div>
+                  </div>
+                <div class="row  p-3">
+                  <div class="col-md-3 text-end text-sm-start text-lg-end">
+                    <label for="numberDevices" class="form-label fw-bold">Number of Devices: </label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control" id="numberDevices" name="numberDevices" disabled> 
+                    <div class="valid-feedback">
+                      Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                      Please provide number of devices.
+                    </div>
+                  </div>
+                  <div class="col-md-1 my-md-auto mt-sm-2">
+                    <a tabindex="0" class="btn btn-warning" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="Before you proceed:" data-bs-content="You can click on this button if this ticket is an RMA">
+                        <i class="fas fa-question-circle text-white" id="devices"></i>
+                    </a>
+                  </div>
+                </div>
+    
+                <div class="row p-3">
+                  <div class="col text-center fw-bold">Is these devices under warranty? &emsp; 
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="warranty" id="warrantyYes" value="true" disabled>
+                      <label class="form-check-label" for="warrantyYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mx-auto">
+                      <input class="form-check-input" type="radio" name="warranty" id="warrantyNo" value="false" disabled>
+                      <label class="form-check-label" for="warrantyNo">No</label>
+                    </div>
+                    <div class="valid-feedback">
+                      Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                      Please provide warranty verification.
+                    </div>
+                  </div>
+                </div>
+                <div class="row p-3">
+                    <div class="col-md-3 text-end text-sm-start text-lg-end">
+                      <label for="region" class="form-label fw-bold">Summary</label>
+                    </div>
+                    <div class="col-md-7">
+                      <textarea name="summary" id="summary" cols="30" rows="5" class="form-control" required></textarea>
+                      <div class="invalid-feedback">
+                        Please provide a summary for this ticket.
+                      </div>   
+                    </div>
+                </div>
+    
+                <div class="col-12 text-center">
+                  <button class="btn btn-success" type="submit">Proceed &nbsp; <i class="far fa-arrow-alt-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </section>
+<%- include ('../partials/footer'); %> 

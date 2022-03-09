@@ -1,0 +1,127 @@
+<%- include ('../partials/header'); %>
+<div class="container-lg container-fluid-md">
+    <div class="row m-0 p-2 mt-3">
+        <%- include ('../partials/vaImage'); %>
+        <div class="col-md-7 col-sm-12">
+            <section class="mt-4  align-self-center">
+                <% if (locals.message) { %>
+                <div class="alert alert-warning alert-dismissible fade show fw-bold text-center" role="alert">
+                    <%= message %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <% } %>
+
+                <div class="text-center bg-white mb-3 p-3 rounded">
+                    <span class=" border-end border-secondary">
+                        <a href="/" class="link-primary text-decoration-none"><i class="fas fa-home"></i>&nbsp; Home</a>
+                        &emsp;
+                    </span> &emsp;
+                    <span class="">
+                        <a href="/tickets" class="link-primary text-decoration-none">All RMA Tickets &nbsp;<i
+                                class="fas fa-list"></i></a>
+                    </span>
+                </div>
+                <div class="card ">
+                    <div class="card-header text-center ">
+                        <div class="clearfix">
+                            <a href="/tickets/<%= _id %>/edit" class="btn btn-info float-start text-white">Edit</a>
+                            <form action="/tickets/<%= _id %>?_method=DELETE" method="POST" class="float-end mb-0">
+                                <button type="submit" class="btn btn-danger ">
+                                    Delete
+                                </button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Ticket details for: <span
+                                class="fs-4 text-dark_blue"><%= ticketNumber %></span></h5>
+                        <div class="row border-bottom border-top pb-2 pl-2">
+                            <div class="col-sm-6 col-md-8 mt-2">Customer: </div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2"><%= customer %></div>
+                        </div>
+                        <% if (numberDevices) { %>
+                        <div class="row border-bottom pb-2 pl-2">
+                            <div class="col-sm-6 col-md-8 mt-2">Number of Devices: </div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2"><span
+                                    class="badge bg-success p-2"><%= numberDevices %></span></div>
+                        </div>
+                        <div class="row border-bottom pb-2 pl-2">
+                            <div class="col-sm-6 col-md-8 mt-2">Warranty</div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2"><span
+                                    class="badge bg-success p-2"><%= (warranty) ? "Under Warranty" : "Out of Warranty" %></span>
+                            </div>
+                        </div>
+                        <% } %>
+                        <% if (request) { %>
+                        <div class="row border-bottom pb-2 pl-2">
+                            <div class="col-sm-6 col-md-8 mt-2">Logged for: </div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2 fw-bold"><%= request %></div>
+                        </div>
+                        <% } %>
+                        <div class="row border-bottom pb-2 pl-2">
+                            <div class="col-sm-6 col-md-8 mt-2">
+                                Summaries for this ticket
+                            </div>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <% for( let index = (summary.length - 1); index >= 0 ; index-- ) { %>
+                            <li class="list-group-item row m-0 p-2 bg-light rounded-top  border border-1 mt-2">
+                                <p class="fst-italic fw-light text-end text-mute ">
+                                    <% let date = new Date(summary[index].dateAdded); %>
+                                    <%= date.toUTCString() %>
+                                </p>
+                                <p class="p-1 text-justify"><%= summary[index].summary %> </p>
+                                <div>
+                                    <form action="/tickets/<%= _id %>/summary?_method=DELETE" method="POST">
+                                        <div class="text-end">
+                                            <input type="hidden" name="summary" value="<%= summary[index].summary %>">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                            <% } %>
+                        </ul>
+                        <!-- <%= locals %> -->
+                    </div>
+                    <div class="card-footer text-muted text-center">
+                        <% let date = new Date(updatedAt); %>
+                        Ticket last updated: <%= date.toDateString() %>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-md-5 col-sm-12 mt-4">
+            <h2 class="fs-3 px-3">Update Ticket</h2>
+            <form action="/tickets/<%= _id %>/summary?_method=PUT" method="POST" class=" g-3 needs-validation align-self-center"
+                novalidate id="updateTicket">
+                <div class="row p-3">
+                    <div class="col-12 text-sm-start">
+                        <label for="region" class="form-label fw-bold fs-5 text-secondary">Provide a new update for this
+                            ticket</label>
+                    </div>
+                    <div class="col-12">
+                        <textarea name="summary" id="summary" cols="30" rows="5" class="form-control"
+                            required></textarea>
+                        <div class="invalid-feedback">
+                            Please provide a summary for this update.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center">
+                    <button class="btn btn-primary" type="submit">Update &nbsp; <i
+                            class="far fa-arrow-alt-circle-up"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<section class="row m-0">
+
+
+</section>
+<%- include ('../partials/footer'); %>

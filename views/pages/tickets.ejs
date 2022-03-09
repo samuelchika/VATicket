@@ -1,0 +1,40 @@
+<%- include ('../partials/header'); %>
+<section class="container pt-3" style="min-height: 80vh;">
+    <%- include ('../partials/vaImage'); %>    
+    <h2 class="h2 mb-3 text-center text-white col-12">Logged Tickets</h2>
+  <section class="row m-0" >
+      <% if (tickets.length > 0) { %>
+        <% tickets.forEach(ticket => { %> 
+            <div class="col-6 mb-3">
+                <div class="card" >
+                  <div class="card-body ">
+                    <div class="clearfix">
+                      <h5 class="card-title fs-2 float-start"><%= ticket.ticketNumber %></h5>
+                      <a href="/tickets/<%= ticket._id %>" class="card-link btn btn-info btn-sm float-end">View Ticket</a>
+                    </div>
+                    <br>
+                    <h6 class="card-subtitle mb-2 text-muted"><span class="fs-3"><%= ticket.customer %></span> <%= ((ticket.warranty) && (ticket.warranty  == true)) ? "- Under Warranty" : "" %> <%= ((ticket.warranty) && (ticket.warranty  == false)) ? "- Out of Warranty" : "" %></h6>
+          
+                    <p class="card-text text-justify " style="height: 6rem; overflow: hidden">
+                        <%= ticket.summary[ticket.summary.length - 1].summary %>
+                    </p>
+                     
+                  </div>
+                  <div class="card-footer">
+                    <% let date = new Date(ticket.updatedAt); %>
+                    <div class="text-center">Last Updated: <span class="fst-italic fw-light"><%= date.toDateString() %></span></div>
+                  </div>
+                </div>
+              </div> 
+            <% }) %> 
+        <% } else { %>
+            <div class="col-12 fs-3 text-center text-white text-uppercase">
+                You have not logged any Ticket.
+            </div>
+        <% } %> 
+    
+      
+    
+  </section>
+</section>
+<%- include ('../partials/footer'); %> 
