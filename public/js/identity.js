@@ -15,7 +15,7 @@ alertList.forEach(function (alert) {
   new bootstrap.Alert(alert)
 })
 
-$(".alert").delay(4000).slideUp(200, function() {
+$(".alert").delay(9000).slideUp(400, function() {
     $(this).alert('close');
 });
 

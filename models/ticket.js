@@ -28,6 +28,10 @@ const TicketSchema = new Schema(
     warranty: {
       type: Boolean
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "Ticketuser"
+    },
     summary: [
       {
         type: Schema.Types.ObjectId,

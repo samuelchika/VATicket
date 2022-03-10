@@ -4,13 +4,17 @@ const path = require("path");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 
 const methodOverride = require("method-override");
 const Ticket = require("./models/ticket");
 const Summary = require("./models/summary");
 const { ticketValidation, userValidation } = require("./models/validation");
+const { isLoggedIn } = require("./middleware");
 const catchAsyncError = require("./Error/catchAsyncError");
 const ErrorHandler = require("./Error/ErrorHanlder");
+const TicketUser = require("./models/ticketuser");
 
 const app = express();
 // connect to mongoose db
@@ -51,8 +55,20 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 app.use(flash());
+
+// we start working on passport from here
+app.use(passport.initialize());
+app.use(passport.session()); // this is for the passport session
+
+passport.use(new LocalStrategy(TicketUser.authenticate()));
+
+// serialize and deserialize user
+passport.serializeUser(TicketUser.serializeUser());
+passport.deserializeUser(TicketUser.deserializeUser());
+
 // making flash global.
 app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.warning = req.flash("warning");
@@ -73,24 +89,31 @@ const validateTicket = (req, res, next) => {
 
 const validateUser = (req, res, next) => {
   const { error } = userValidation.validate(req.body);
-  if(error) {
+  if (error) {
     const message = error.details.map((el) => el.message).join(",");
-    req.flash("error", message)
+    if (message.includes("confirmPassword")) {
+      var errorMessage = "Password Mismatch";
+    } else if (message.includes("pattern")) {
+      errorMessage =
+        "Password must be 8-16 characters containing uppercase, lowercase, numbers and special character";
+    }
+    req.flash("error", errorMessage);
     res.redirect("/identify");
   } else {
     next();
   }
-}
+};
 app.get("/", (req, res) => {
   res.render("pages/index");
 });
 
-app.get("/tickets/create", (req, res) => {
+app.get("/tickets/create", isLoggedIn, (req, res) => {
   res.render("pages/new");
 });
-
+// create new ticket
 app.post(
   "/tickets/new",
+  isLoggedIn,
   validateTicket,
   catchAsyncError(async (req, res) => {
     // console.log(req.body);
@@ -110,6 +133,8 @@ app.post(
         delete ticket.summary;
         var summary = new Summary(summ);
         ticket.summary = summary;
+        // add the logged in person into the ticket
+        ticket.owner = req.user;
       }
       const newTicket = new Ticket(ticket);
       // console.log(newTicket);
@@ -117,7 +142,10 @@ app.post(
 
       await summary.save();
       await newTicket.save();
-      req.flash("success", `Ticket - ${newTicket.ticketNumber} created successfully`);
+      req.flash(
+        "success",
+        `Ticket - ${newTicket.ticketNumber} created successfully`
+      );
       res.redirect(`/tickets/${newTicket._id}`);
     }
   })
@@ -126,6 +154,7 @@ app.post(
 // SHOW TICKETS.
 app.get(
   "/tickets",
+  isLoggedIn,
   catchAsyncError(async (req, res) => {
     const tickets = await Ticket.find().populate("summary");
     //console.log(tickets);
@@ -148,6 +177,7 @@ app.get(
 // EDIT TICKET
 app.get(
   "/tickets/:id/edit",
+  isLoggedIn,
   catchAsyncError(async (req, res) => {
     const { id } = req.params;
     const tickets = await Ticket.findById(id).populate("summary");
@@ -160,6 +190,7 @@ app.get(
 // UPDATE TICKET
 app.put(
   "/tickets/:id",
+  isLoggedIn,
   catchAsyncError(async (req, res) => {
     const { id } = req.params;
     var ticket = req.body;
@@ -182,6 +213,7 @@ app.put(
 // DELETE TICKET
 app.delete(
   "/tickets/:id",
+  isLoggedIn,
   catchAsyncError(async (req, res) => {
     const { id } = req.params;
 
@@ -193,6 +225,7 @@ app.delete(
 // ADD SUMMARY
 app.put(
   "/tickets/:id/summary",
+  isLoggedIn,
   catchAsyncError(async (req, res) => {
     const { id } = req.params;
 
@@ -211,6 +244,7 @@ app.put(
 // DELETE SUMMARY
 app.delete(
   "/tickets/:id/summary",
+  isLoggedIn,
   catchAsyncError(async (req, res) => {
     const { id } = req.params;
     const summaryId = req.body.summaryId;
@@ -231,14 +265,49 @@ app.delete(
 );
 
 // register user
-app.get('/identify', (req, res) => {
+app.get("/identify", (req, res) => {
   res.render("user/register");
-})
+});
 
-app.post("/register", validateUser, (req, res) => {
-  res.send(req.body);
-})
+app.post("/register", validateUser, async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const ticketUser = new TicketUser({ username });
+    await TicketUser.register(ticketUser, password);
+    // user is successfully registered.
+    // do not sign them in automatically
+    req.flash(
+      "success",
+      "Account successfully created. Please Login to proceed."
+    );
+    res.redirect("/identify");
+  } catch (e) {
+    // user already exist redirect to login.
+    // console.log(e.message);
+    req.flash("error", e.message);
+    res.redirect("/identify");
+  }
+});
 
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureFlash: true,
+    failureRedirect: "/identify"
+  }),
+  (req, res) => {
+    // user was successfully logged in
+    req.flash("success", "Welcome to Virtual Access Ticket Tracker!");
+    res.redirect("/");
+  }
+);
+
+//logout
+app.get("/logout", (req, res) => {
+  req.logout();
+  req.flash("success", "Successfully Logged Out - We will miss you!");
+  res.redirect("/");
+});
 // unknown pages redirect
 app.all("*", (req, res, next) => {
   res.send(new ErrorHandler("Page Not found", 404));
