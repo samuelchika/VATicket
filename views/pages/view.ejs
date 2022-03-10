@@ -2,7 +2,7 @@
 <div class="container-lg container-fluid-md">
     <div class="row m-0 p-2 mt-3">
         <%- include ('../partials/vaImage'); %>
-        <%- include ('../partials/flash'); %>
+        
         <div class="col-md-7 col-sm-12">
             <section class="mt-4  align-self-center">
                 <% if (locals.message) { %>
@@ -22,6 +22,7 @@
                                 class="fas fa-list"></i></a>
                     </span>
                 </div>
+                <%- include ('../partials/flash'); %>
                 <div class="card ">
                     <div class="card-header text-center ">
                         <div class="clearfix">

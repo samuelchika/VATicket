@@ -10,7 +10,13 @@
                   <div class="card-body ">
                     <div class="clearfix">
                       <h5 class="card-title fs-2 float-start"><%= ticket.ticketNumber %></h5>
-                      <a href="/tickets/<%= ticket._id %>" class="card-link btn btn-info btn-sm float-end">View Ticket</a>
+                      <a href="/tickets/<%= ticket._id %>" class="card-link btn btn-info btn-sm float-end position-relative">
+                        View Ticket
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                          <%= ticket.summary.length %> 
+                          <span class="visually-hidden">unread messages</span>
+                        </span>
+                      </a>
                     </div>
                     <br>
                     <h6 class="card-subtitle mb-2 text-muted"><span class="fs-3"><%= ticket.customer %></span> <%= ((ticket.warranty) && (ticket.warranty  == true)) ? "- Under Warranty" : "" %> <%= ((ticket.warranty) && (ticket.warranty  == false)) ? "- Out of Warranty" : "" %></h6>

@@ -8,7 +8,7 @@ const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const Ticket = require("./models/ticket");
 const Summary = require("./models/summary");
-const { ticketValidation } = require("./models/validation");
+const { ticketValidation, userValidation } = require("./models/validation");
 const catchAsyncError = require("./Error/catchAsyncError");
 const ErrorHandler = require("./Error/ErrorHanlder");
 
@@ -56,6 +56,8 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.warning = req.flash("warning");
+
+  next();
 });
 
 const validateTicket = (req, res, next) => {
@@ -69,6 +71,16 @@ const validateTicket = (req, res, next) => {
   }
 };
 
+const validateUser = (req, res, next) => {
+  const { error } = userValidation.validate(req.body);
+  if(error) {
+    const message = error.details.map((el) => el.message).join(",");
+    req.flash("error", message)
+    res.redirect("/identify");
+  } else {
+    next();
+  }
+}
 app.get("/", (req, res) => {
   res.render("pages/index");
 });
@@ -105,6 +117,7 @@ app.post(
 
       await summary.save();
       await newTicket.save();
+      req.flash("success", `Ticket - ${newTicket.ticketNumber} created successfully`);
       res.redirect(`/tickets/${newTicket._id}`);
     }
   })
@@ -216,6 +229,15 @@ app.delete(
     res.redirect(`/tickets/${id}`);
   })
 );
+
+// register user
+app.get('/identify', (req, res) => {
+  res.render("user/register");
+})
+
+app.post("/register", validateUser, (req, res) => {
+  res.send(req.body);
+})
 
 // unknown pages redirect
 app.all("*", (req, res, next) => {
