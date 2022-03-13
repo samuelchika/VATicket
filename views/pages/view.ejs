@@ -1,17 +1,9 @@
 <%- include ('../partials/header'); %>
 <div class="container-lg container-fluid-md">
     <div class="row m-0 p-2 mt-3">
-        <%- include ('../partials/vaImage'); %>
-        
+        <%- include ('../partials/vaImage'); %> 
         <div class="col-md-7 col-sm-12">
             <section class="mt-4  align-self-center">
-                <% if (locals.message) { %>
-                <div class="alert alert-warning alert-dismissible fade show fw-bold text-center" role="alert">
-                    <%= message %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <% } %>
-
                 <div class="text-center bg-white mb-3 p-3 rounded">
                     <span class=" border-end border-secondary">
                         <a href="/" class="link-primary text-decoration-none"><i class="fas fa-home"></i>&nbsp; Home</a>
@@ -23,11 +15,12 @@
                     </span>
                 </div>
                 <%- include ('../partials/flash'); %>
+                
                 <div class="card ">
                     <div class="card-header text-center ">
                         <div class="clearfix">
-                            <a href="/tickets/<%= _id %>/edit" class="btn btn-info float-start text-white">Edit</a>
-                            <form action="/tickets/<%= _id %>?_method=DELETE" method="POST" class="float-end mb-0">
+                            <a href="/tickets/<%= ticket._id %>/edit" class="btn btn-info float-start text-white">Edit</a>
+                            <form action="/tickets/<%= ticket._id %>?_method=DELETE" method="POST" class="float-end mb-0">
                                 <button type="submit" class="btn btn-danger ">
                                     Delete
                                 </button>
@@ -37,47 +30,75 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">Ticket details for: <span
-                                class="fs-4 text-dark_blue"><%= ticketNumber %></span></h5>
+                                class="fs-4 text-dark_blue"><%= ticket.ticketNumber %></span></h5>
                         <div class="row border-bottom border-top pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Customer: </div>
-                            <div class="col-sm-6 col-md-4 border-start mt-2"><%= customer %></div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2"><%= ticket.customer %></div>
                         </div>
-                        <% if (numberDevices) { %>
+                        <% if (ticket.numberDevices) { %>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Number of Devices: </div>
                             <div class="col-sm-6 col-md-4 border-start mt-2"><span
-                                    class="badge bg-success p-2"><%= numberDevices %></span></div>
+                                    class="badge bg-success p-2"><%= ticket.numberDevices %></span></div>
                         </div>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Warranty</div>
                             <div class="col-sm-6 col-md-4 border-start mt-2"><span
-                                    class="badge bg-success p-2"><%= (warranty) ? "Under Warranty" : "Out of Warranty" %></span>
+                                    class="badge bg-success p-2"><%= (ticket.warranty) ? "Under Warranty" : "Out of Warranty" %></span>
                             </div>
                         </div>
                         <% } %>
-                        <% if (request) { %>
+                        <% if (ticket.request) { %>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Logged for: </div>
-                            <div class="col-sm-6 col-md-4 border-start mt-2 fw-bold"><%= request %></div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2 fw-bold"><%= ticket.request %></div>
                         </div>
                         <% } %>
+                        <div class="row border-bottom pb-2 pl-2">
+                            <div class="col-sm-6 col-md-6 mt-2 my-auto">Assign To: </div>
+                             
+                            <form class="col-sm-6 col-md-6 border-start mt-2" action="/tickets/<%= ticket._id %>/assign?_method=PUT" method="POST">
+                                <div class="row g-3 align-items-center mb-0">
+                                    <% if(ticket.assignedTo) { %> 
+                                   <div class="col-auto fw-bold lead">
+                                        <%= ticket.assignedTo.username %> 
+                                    </div>
+                                    <% } %>
+                                    <div class="col-auto">
+                                        <% if(users.length !== 0) {  %> 
+                                            <select class="form-select" aria-label="Default select example" name="assignedTo" required>
+                                                <option value="">Select Colleague</option>
+                                                <% users.forEach(user => { %> 
+                                                    <% if (!currentUser.equals(user) && !ticket.assignedTo.equals(user)) { %> 
+                                                    <option value="<%= user._id %>"><%= user.username %></option>
+                                                    <% } %> 
+                                                <% }) %> 
+                                              </select>
+                                              <% } %>
+                                    </div>
+                                    <div class="col-auto">
+                                      <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-exchange-alt"></i></button>
+                                    </div>
+                                  </div>                                  
+                            </form>
+                        </div>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">
                                 Summaries for this ticket
                             </div>
                         </div>
                         <ul class="list-group list-group-flush">
-                            <% for( let index = (summary.length - 1); index >= 0 ; index-- ) { %>
+                            <% for( let index = (ticket.summary.length - 1); index >= 0 ; index-- ) { %>
                             <li class="list-group-item row m-0 p-2 bg-light rounded-top  border border-1 mt-2">
                                 <p class="fst-italic fw-light text-end text-mute ">
-                                    <% let date = new Date(summary[index].dateAdded); %>
+                                    <% let date = new Date(ticket.summary[index].dateAdded); %>
                                     <%= date.toUTCString() %>
                                 </p>
-                                <p class="p-1 text-justify"><%= summary[index].summary %> </p>
+                                <p class="p-1 text-justify"><%= ticket.summary[index].summary %> </p>
                                 <div>
-                                    <form action="/tickets/<%= _id %>/summary?_method=DELETE" method="POST">
+                                    <form action="/tickets/<%= ticket._id %>/summary?_method=DELETE" method="POST">
                                         <div class="text-end">
-                                            <input type="hidden" name="summaryId" value="<%= summary[index]._id %>">
+                                            <input type="hidden" name="summaryId" value="<%= ticket.summary[index]._id %>">
                                             <button type="submit" class="btn btn-danger btn-sm">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
@@ -87,10 +108,9 @@
                             </li>
                             <% } %>
                         </ul>
-                        <!-- <%= locals %> -->
                     </div>
                     <div class="card-footer text-muted text-center">
-                        <% let date = new Date(updatedAt); %>
+                        <% let date = new Date(ticket.updatedAt); %>
                         Ticket last updated: <%= date.toDateString() %>
                     </div>
                 </div>
@@ -98,7 +118,7 @@
         </div>
         <div class="col-md-5 col-sm-12 mt-4">
             <h2 class="fs-3 px-3">Update Ticket</h2>
-            <form action="/tickets/<%= _id %>/summary?_method=PUT" method="POST" class=" g-3 needs-validation align-self-center"
+            <form action="/tickets/<%= ticket._id %>/summary?_method=PUT" method="POST" class=" g-3 needs-validation align-self-center"
                 novalidate id="updateTicket">
                 <div class="row p-3">
                     <div class="col-12 text-sm-start">

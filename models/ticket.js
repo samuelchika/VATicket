@@ -32,6 +32,10 @@ const TicketSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Ticketuser"
     },
+    assignedTo: {
+      type: Schema.Types.ObjectId,
+      ref: "TicketOwner"
+    },
     summary: [
       {
         type: Schema.Types.ObjectId,

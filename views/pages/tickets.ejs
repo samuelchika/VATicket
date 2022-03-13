@@ -1,6 +1,9 @@
 <%- include ('../partials/header'); %>
 <section class="container pt-3" style="min-height: 80vh;">
-    <%- include ('../partials/vaImage'); %>    
+    <%- include ('../partials/vaImage'); %>  
+    <div class="col-6 offset-3">
+      <%- include ('../partials/flash'); %>
+  </div>  
     <h2 class="h2 mb-3 text-center text-white col-12">Logged Tickets</h2>
   <section class="row m-0" >
       <% if (tickets.length > 0) { %>
