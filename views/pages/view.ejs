@@ -6,13 +6,20 @@
             <section class="mt-4  align-self-center">
                 <div class="text-center bg-white mb-3 p-3 rounded">
                     <span class=" border-end border-secondary">
+                        <a href="/logout" class="link-dark text-decoration-none"><i class="fas fa-power-off text-danger"></i></i>&nbsp; <strong>Logout</strong></a>
+                        &emsp;
+                    </span> &emsp;
+                    <span class=" border-end border-secondary">
                         <a href="/" class="link-primary text-decoration-none"><i class="fas fa-home"></i>&nbsp; Home</a>
                         &emsp;
                     </span> &emsp;
-                    <span class="">
+                    <span class="border-end border-secondary">
                         <a href="/tickets" class="link-primary text-decoration-none">All RMA Tickets &nbsp;<i
-                                class="fas fa-list"></i></a>
-                    </span>
+                                class="fas fa-list"></i></a> &emsp;
+                    </span> &emsp; 
+                    <span class="lead">
+                        <i class="far fa-id-badge text-success "></i>&nbsp; <strong class="fw-bold"><%= currentUser.username %></strong>
+                    </span>                    
                 </div>
                 <%- include ('../partials/flash'); %>
                 
@@ -33,7 +40,7 @@
                                 class="fs-4 text-dark_blue"><%= ticket.ticketNumber %></span></h5>
                         <div class="row border-bottom border-top pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Customer: </div>
-                            <div class="col-sm-6 col-md-4 border-start mt-2"><%= ticket.customer %></div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2 fw-bold"><%= ticket.customer %></div>
                         </div>
                         <% if (ticket.numberDevices) { %>
                         <div class="row border-bottom pb-2 pl-2">
@@ -47,7 +54,9 @@
                                     class="badge bg-success p-2"><%= (ticket.warranty) ? "Under Warranty" : "Out of Warranty" %></span>
                             </div>
                         </div>
+                        
                         <% } %>
+                        
                         <% if (ticket.request) { %>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Logged for: </div>
@@ -55,8 +64,25 @@
                         </div>
                         <% } %>
                         <div class="row border-bottom pb-2 pl-2">
+                            <div class="col-sm-6 col-md-8 mt-2">Ticket Owner</div>
+                            <div class="col-sm-6 col-md-4 border-start mt-2"><i class="fas fa-user-circle text-secondary"></i> <strong><%= (ticket.owner.username) %></strong></div>
+                        </div>
+                        <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-6 mt-2 my-auto">Assign To: </div>
-                             
+                            <% if (ticket.owner.equals(currentUser) && ticket.assignedTo) { %>
+                                <form class="col-sm-6 col-md-4 offset-md-2 border-start mt-2" action="/tickets/<%= ticket._id %>/reclaim?_method=PUT" method="POST">
+                                    <div class="row g-3 align-items-center mb-0">
+                                        <div class="col-auto fw-bold lead">
+                                            <input type="hidden" name="assignedTo" value="<%= ticket.assignedTo.username %>">
+                                            <%= ticket.assignedTo.username %> 
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn btn-success">Reclaim</button>
+                                          </div>
+                                    </div>
+                                </form>
+                            <% } else { %> 
+
                             <form class="col-sm-6 col-md-6 border-start mt-2" action="/tickets/<%= ticket._id %>/assign?_method=PUT" method="POST">
                                 <div class="row g-3 align-items-center mb-0">
                                     <% if(ticket.assignedTo) { %> 
@@ -69,18 +95,25 @@
                                             <select class="form-select" aria-label="Default select example" name="assignedTo" required>
                                                 <option value="">Select Colleague</option>
                                                 <% users.forEach(user => { %> 
-                                                    <% if (!currentUser.equals(user) && !ticket.assignedTo.equals(user)) { %> 
-                                                    <option value="<%= user._id %>"><%= user.username %></option>
+                                                   
+                                                    <% if (!currentUser.equals(user))  { %>
+                                                        <% if ((ticket.assignedTo) && ticket.assignedTo.equals(user)) {%>  
+
+                                                        <% } else { %> 
+                                                            <option value="<%= user._id %>"><%= user.username %></option>
+                                                        <% } %> 
+                                                    
                                                     <% } %> 
                                                 <% }) %> 
                                               </select>
                                               <% } %>
                                     </div>
                                     <div class="col-auto">
-                                      <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-exchange-alt"></i></button>
+                                      <button type="submit" class="btn btn-primary"><i class="fas fa-exchange-alt"></i></button>
                                     </div>
                                   </div>                                  
                             </form>
+                        <% } %> 
                         </div>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">
@@ -94,7 +127,14 @@
                                     <% let date = new Date(ticket.summary[index].dateAdded); %>
                                     <%= date.toUTCString() %>
                                 </p>
-                                <p class="p-1 text-justify"><%= ticket.summary[index].summary %> </p>
+                                <figure class="text-justify">
+                                    <blockquote class="blockquote">
+                                        <p class="p-1"><%= ticket.summary[index].summary %> </p>
+                                    </blockquote>
+                                    <figcaption class="blockquote-footer">
+                                        <cite title="<%= ticket.summary[index].author.username %>"><%= ticket.summary[index].author.username %></cite>
+                                    </figcaption>
+                                  </figure>
                                 <div>
                                     <form action="/tickets/<%= ticket._id %>/summary?_method=DELETE" method="POST">
                                         <div class="text-end">
@@ -122,7 +162,7 @@
                 novalidate id="updateTicket">
                 <div class="row p-3">
                     <div class="col-12 text-sm-start">
-                        <label for="region" class="form-label fw-bold fs-5 text-secondary">Provide a new update for this ticket</label>
+                        <label for="region" class="form-label fw-bold fs-5 text-dark">Provide a new update for this ticket</label>
                     </div>
                     <div class="col-12">
                         <textarea name="summary" id="summary" cols="30" rows="5" class="form-control"

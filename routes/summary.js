@@ -12,7 +12,7 @@ router.put(
     catchAsyncError(async (req, res) => {
         const { id } = req.params;
         if (req.body.summary !== "" && typeof req.body.summary !== undefined) {
-            var summ = { summary: req.body.summary, dateCreated: new Date() };
+            var summ = { summary: req.body.summary, author: req.user, dateCreated: new Date() };
             var summary = new Summary(summ);
         }
         await summary.save();

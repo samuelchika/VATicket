@@ -44,7 +44,7 @@ router.post(
         } else {
         var ticket = req.body;
         if (ticket.summary !== "" && typeof ticket.summary !== undefined) {
-            var summ = { summary: ticket.summary, dateCreated: new Date() };
+            var summ = { summary: ticket.summary, dateCreated: new Date(), author: req.user };
             delete ticket.summary;
             var summary = new Summary(summ);
             ticket.summary = summary;
@@ -71,7 +71,12 @@ router.get(
     "/",
     isLoggedIn,
     catchAsyncError(async (req, res) => {
-        const tickets = await Ticket.find({owner: req.user}).populate("summary");
+        const tickets = await Ticket.find({ $or : [ {owner: req.user}, { assignedTo: req.user} ]}).populate({
+            path: "summary",
+            populate: {
+              path: "author"
+            }
+          }).populate("owner");
         //console.log(tickets);
         res.render("pages/tickets", { tickets });
     })
@@ -83,7 +88,12 @@ router.get(
     isLoggedIn,
     catchAsyncError(async (req, res) => {
         const { id } = req.params;
-            const ticket = await Ticket.findById(id).populate("summary").populate("assignedTo");
+            const ticket = await Ticket.findById(id).populate({
+                path: "summary",
+                populate: {
+                  path: "author"
+                }
+              }).populate("assignedTo").populate("owner");
             const users = await TicketOwner.find();
             // use an if statement to ensure error free program
             if(ticket) {
@@ -150,23 +160,33 @@ router.delete(
 router.put("/:id/assign", isLoggedIn, isAuthorized, catchAsyncError(async (req, res) => {
     // we can now update the ticket.
     const { id } = req.params;
-    console.log(req.body.assignedTo)
+    //console.log(req.body.assignedTo)
     if(req.body.assignedTo || !req.body.assignedTo.equals("Select Colleague")) {
         // assigned to exists
         const user = await TicketOwner.findById(req.body.assignedTo);
-        console.log(user)
+        //console.log(user)
         if (await Ticket.findByIdAndUpdate(id, req.body)) {
             req.flash("success", `Ticket is now assigned to ${user.username}`);
-            res.redirect(`/tickets/${id}`);
         } else {
             req.flash("error", `Error assigning ticket to user - ${user.username}`)
         } 
-
     } else {
         // assigned to is empty.
-        req.flash("error", "Select who to assign ticket to");
-        res.redirect(`/tickets/${id}`);
+        req.flash("error", "Select who to assign ticket to"); 
     }
+    res.redirect(`/tickets/${id}`);
+}));
+
+
+router.put("/:id/reclaim", isLoggedIn, isAuthorized, catchAsyncError(async (req, res) => {
+    // we can now update the ticket.
+    const { id } = req.params;
+    if (await Ticket.findByIdAndUpdate(id, {assignedTo: null})) {
+        req.flash("success", `You have successfully reclaim ticket from ${req.body.assignedTo}`);
+    } else {
+        req.flash("error", `Error reclaiming ticket from - ${req.body.assignedTo}`)
+    } 
+    res.redirect(`/tickets/${id}`);
 }));
 
 module.exports = router;

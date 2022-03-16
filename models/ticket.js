@@ -30,7 +30,7 @@ const TicketSchema = new Schema(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "Ticketuser"
+      ref: "TicketOwner"
     },
     assignedTo: {
       type: Schema.Types.ObjectId,

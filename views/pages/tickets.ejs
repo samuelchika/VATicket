@@ -12,7 +12,7 @@
                 <div class="card" >
                   <div class="card-body ">
                     <div class="clearfix">
-                      <h5 class="card-title fs-2 float-start"><%= ticket.ticketNumber %></h5>
+                      <h5 class="card-title fs-2 float-start"><%= ticket.ticketNumber %><small class="fs-5 text-muted my-auto"> - <%= ticket.owner.username %></small></h5>
                       <a href="/tickets/<%= ticket._id %>" class="card-link btn btn-info btn-sm float-end position-relative">
                         View Ticket
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -24,10 +24,14 @@
                     <br>
                     <h6 class="card-subtitle mb-2 text-muted"><span class="fs-3"><%= ticket.customer %></span> <%= ((ticket.warranty) && (ticket.warranty  == true)) ? "- Under Warranty" : "" %> <%= ((ticket.warranty) && (ticket.warranty  == false)) ? "- Out of Warranty" : "" %></h6>
           
-                    <p class="card-text text-justify " style="height: 6rem; overflow: hidden">
-                        <%= ticket.summary[ticket.summary.length - 1].summary %>
-                    </p>
-                     
+                    <figure class="text-end">
+                      <blockquote class="blockquote">
+                        <p class="mb-3" style="height: 6rem; overflow: hidden"><%= ticket.summary[ticket.summary.length - 1].summary %></p>
+                      </blockquote>
+                      <figcaption class="blockquote-footer">
+                        <cite title="Ticket Owner"><%= ticket.summary[ticket.summary.length - 1].author.username %></cite>
+                      </figcaption>
+                    </figure>
                   </div>
                   <div class="card-footer">
                     <% let date = new Date(ticket.updatedAt); %>
