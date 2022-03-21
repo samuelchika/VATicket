@@ -1,1 +1,17 @@
-<%= err.message %> 
+
+<%- include ('../partials/header'); %>
+<section class="container">
+  <section class="row" style="min-height: 90vh;">
+    <div class="  align-self-center">
+      <div class="col-6 offset-3">
+          <%- include ('../partials/flash'); %>
+      </div>        
+        <%- include ('../partials/vaImage'); %>
+      <div class="text-center gx-5 ">
+         <h1 class="bg-danger text-light p-3"><%= err.message %> </h1>
+         <p class="lead fw-bold">Click on the Image to go back to Homepage</p>
+      </div>
+    </div>
+  </section>
+</section>
+<%- include ('../partials/footer'); %> 

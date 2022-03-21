@@ -5,8 +5,10 @@ const Summary = require("../models/summary");
 const TicketOwner = require("../models/ticketuser");
 const { isLoggedIn, isAuthorized } = require("../middleware");
 const catchAsyncError = require("../Error/catchAsyncError");
-const { ticketValidation } = require("../models/validation");
+const { ticketValidation, searchValidation } = require("../models/validation");
 const ticket = require("../models/ticket");
+const TicketHistory = require("../models/ticketHistory");
+const ErrorHandler = require("../Error/ErrorHanlder");
 
 
 const validateTicket = (req, res, next) => {
@@ -14,12 +16,25 @@ const validateTicket = (req, res, next) => {
     const { error } = ticketValidation.validate(req.body);
     if (error) {
       const message = error.details.map((el) => el.message).join(",");
-      throw new ErrorHandler(message, 400);
+      //throw new ErrorHandler(message, 400);
+      req.flash("error", message);
+      return res.redirect("/tickets/create");
     } else {
       next();
     }
   };
   
+  const validateSearch = (req, res, next) => {
+      const { error } = searchValidation.validate(req.body);
+      if(error) {
+        const message = error.details.map((el) => el.message).join(",");
+        //throw new ErrorHandler(message, 400);
+        req.flash("error", message);
+        return res.redirect("/tickets/history");
+      } else {
+          next()
+      }
+  }
 
 router.get("/create", isLoggedIn, (req, res) => {
     res.render("pages/new");
@@ -32,37 +47,42 @@ router.post(
     validateTicket,
     catchAsyncError(async (req, res) => {
         // console.log(req.body);
-
-        const checkTicket = await Ticket.findOne({
-        ticketNumber: parseInt(req.body.ticketNumber)
-        });
-
-        if (checkTicket) {
-        // ticket already exist
-        req.flash("warning", `Ticket ${req.body.ticketNumber} already exist`);
-        res.redirect(`/tickets/${checkTicket._id}`);
-        } else {
-        var ticket = req.body;
-        if (ticket.summary !== "" && typeof ticket.summary !== undefined) {
-            var summ = { summary: ticket.summary, dateCreated: new Date(), author: req.user };
-            delete ticket.summary;
-            var summary = new Summary(summ);
-            ticket.summary = summary;
-            // add the logged in person into the ticket
-            ticket.owner = req.user;
+        try {
+            const checkTicket = await Ticket.findOne({
+            ticketNumber: parseInt(req.body.ticketNumber)
+            });
+    
+            if (checkTicket) {
+            // ticket already exist
+            req.flash("warning", `Ticket ${req.body.ticketNumber} already exist`);
+            res.redirect(`/tickets/${checkTicket._id}`);
+            } else {
+            var ticket = req.body;
+            if (ticket.summary !== "" && typeof ticket.summary !== undefined) {
+                var summ = { summary: ticket.summary, dateCreated: new Date(), author: req.user };
+                delete ticket.summary;
+                var summary = new Summary(summ);
+                ticket.summary = summary;
+                // add the logged in person into the ticket
+                ticket.owner = req.user;
+            }
+            const newTicket = new Ticket(ticket);
+            // console.log(newTicket);
+            // console.log(newTicket._id.getTimestamp());
+    
+            await summary.save();
+            await newTicket.save();
+            req.flash(
+                "success",
+                `Ticket - ${newTicket.ticketNumber} created successfully`
+            );
+            res.redirect(`/tickets/${newTicket._id}`);
+            }
+        } catch (error) {
+            req.flash("error", error.message);
+            res.redirect("/tickets/create")
         }
-        const newTicket = new Ticket(ticket);
-        // console.log(newTicket);
-        // console.log(newTicket._id.getTimestamp());
-
-        await summary.save();
-        await newTicket.save();
-        req.flash(
-            "success",
-            `Ticket - ${newTicket.ticketNumber} created successfully`
-        );
-        res.redirect(`/tickets/${newTicket._id}`);
-        }
+        
     })
   );
   
@@ -81,6 +101,48 @@ router.get(
         res.render("pages/tickets", { tickets });
     })
 );
+
+// VIEW TICKET HISTORY
+router.get("/history", isLoggedIn, catchAsyncError(async(req, res) => {
+    // we have to get the ticket history.
+    res.render("pages/history");
+}));
+
+// TICKET SEARCH
+router.post("/searchHistory", isLoggedIn, validateSearch, catchAsyncError(async(req, res) => {
+    // SEARCH IF THE TICKET EXIST
+    const ticket = await Ticket.findOne(req.body);
+    if (ticket) {
+        // ticket exist
+        // use the ticketID to search the ticket history
+        
+        if(ticket.owner.equals(req.user._id) || ticket.assignedTo.equals(req.user._id)) {
+            const ticketHistory = await TicketHistory.find({ ticketId: ticket._id })
+            .populate("assignedBy")
+            .populate("assignedTo")
+            .populate({
+                path: "ticketId",
+                populate: {
+                    path: "summary"
+                }
+            });
+            // console.log(req.user)
+            // console.log(ticket)
+            // console.log(ticketHistory)
+            res.render("pages/history", { ticketHistory });
+        } else {
+            req.flash("error", "You don't have the privilege to access this ticket");
+            res.redirect("/tickets/history")
+        }
+            
+
+    } else {
+        req.flash("error", "Ticket does not exist");
+        res.redirect("/tickets/history")
+    }
+    // CHECK IF THE USER IS AUTHORIZED TO ACCESS THE TICKET.
+
+}))
 
 // VIEW TICKET
 router.get(
@@ -165,16 +227,28 @@ router.put("/:id/assign", isLoggedIn, isAuthorized, catchAsyncError(async (req, 
         // assigned to exists
         const user = await TicketOwner.findById(req.body.assignedTo);
         //console.log(user)
-        if (await Ticket.findByIdAndUpdate(id, req.body)) {
-            req.flash("success", `Ticket is now assigned to ${user.username}`);
+        if(user) {
+            if (await Ticket.findByIdAndUpdate(id, req.body)) {
+                // if ticket was successfully assigned to another person, we have to acoount for it.
+                const ticketHistory = new TicketHistory({
+                    ticketId: id,
+                    assignedBy: req.user,
+                    assignedTo: req.body.assignedTo
+                });
+                await ticketHistory.save();
+                req.flash("success", `Ticket is now assigned to ${user.username}`);
+            } else {
+                req.flash("error", `Error assigning ticket to user - ${user.username}`)
+            } 
         } else {
-            req.flash("error", `Error assigning ticket to user - ${user.username}`)
-        } 
+            // the user don't exist
+            req.flash("error", "The user you entered don't exist!");
+        }
     } else {
         // assigned to is empty.
         req.flash("error", "Select who to assign ticket to"); 
     }
-    res.redirect(`/tickets/${id}`);
+    res.redirect("/tickets");
 }));
 
 
@@ -182,11 +256,22 @@ router.put("/:id/reclaim", isLoggedIn, isAuthorized, catchAsyncError(async (req,
     // we can now update the ticket.
     const { id } = req.params;
     if (await Ticket.findByIdAndUpdate(id, {assignedTo: null})) {
+        const ticketHistory = new TicketHistory({
+            ticketId: id,
+            assignedBy: req.user,
+            assignedTo: req.user,
+            reclaimed: 1
+        });
+        await ticketHistory.save();
+
+        // erropr check for the history should be done later and should displayed based on the person priviledge
         req.flash("success", `You have successfully reclaim ticket from ${req.body.assignedTo}`);
     } else {
         req.flash("error", `Error reclaiming ticket from - ${req.body.assignedTo}`)
     } 
     res.redirect(`/tickets/${id}`);
 }));
+
+
 
 module.exports = router;

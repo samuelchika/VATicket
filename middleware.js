@@ -19,13 +19,13 @@ module.exports.isAuthorized = async (req, res, next) => {
   const ticket = await Ticket.findById(id);
   if (ticket) {
     // we were able to find the ticket.
-    if(ticket.owner.equals(req.user._id) || ((ticket.assignedTo !== null) && (ticket.assignedTo.equals(reeq.user._id))) ) {
+    if(ticket.owner.equals(req.user._id) || ((ticket.assignedTo !== null) && (ticket.assignedTo.equals(req.user._id))) ) {
       // this is the owner of the ticket.
       // futher action can be carried out.
       next();
     } else {
       // the user is not the owner of the ticket.
-      req.flash("error", "You do not have the privilege to perform such operation");
+      req.flash("error", "You do not have the privilege to perform action on this ticket");
       res.redirect("/tickets");
     }
   } else {

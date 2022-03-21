@@ -3,10 +3,24 @@
     <%- include ('../partials/vaImage'); %>  
     <div class="col-6 offset-3">
       <%- include ('../partials/flash'); %>
-  </div>  
-    <h2 class="h2 mb-3 text-center text-white col-12">Logged Tickets</h2>
+  </div>
+  <div class="text-center bg-white mb-3 p-3 rounded col-sm-12 col-md-6 offset-md-3">
+    <span class=" border-end border-secondary">
+        <a href="/logout" class="link-dark text-decoration-none"><i class="fas fa-power-off text-danger"></i></i>&nbsp; <strong>Logout</strong></a>
+        &emsp;
+    </span> &emsp;
+    <span class=" border-end border-secondary">
+        <a href="/" class="link-primary text-decoration-none"><i class="fas fa-home"></i>&nbsp; Home</a>
+        &emsp;
+    </span> &emsp; 
+    <span class="lead">
+        <i class="far fa-id-badge text-success "></i>&nbsp; <strong class="fw-bold"><%= currentUser.username %></strong>
+    </span>                    
+</div>
+    
   <section class="row m-0" >
       <% if (tickets.length > 0) { %>
+        <h2 class="h2 mb-3 text-center text-white col-12">Logged Tickets</h2>
         <% tickets.forEach(ticket => { %> 
             <div class="col-6 mb-3">
                 <div class="card" >

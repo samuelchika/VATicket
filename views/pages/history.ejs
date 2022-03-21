@@ -1,0 +1,35 @@
+<%- include ('../partials/header'); %>
+<section class="container">
+  <section class="row" style="min-height: 90vh;">
+    <div class="  align-self-center">
+        <div class="col-6 offset-3">
+            <%- include ('../partials/flash'); %>
+        </div>        
+        <%- include ('../partials/vaImage'); %>
+        <h2 class="h2 mb-3 text-center text-white">Search Ticket for History</h2>
+        <form action="/tickets/searchHistory" method="POST" class="col-sm-8 offset-sm-2 col-md-4 offset-md-4">
+            <div class="mb-3">
+                <input type="search" class="form-control" id="ticketNumber" name="ticketNumber" >
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+        <% if (locals.ticketHistory) { %>
+            <div class="mt-2 table-responsive">
+            <% ticketHistory.forEach((ticket => {
+                if(ticket.ticketId.summary) {
+                    ticket.ticketId.summary.forEach((summary) => {
+                        %>
+                        <%= summary %> 
+                        <%  
+                    })
+                }
+            })) %> 
+                
+            </div>
+        <% } %>
+    </div>
+  </section>
+</section>
+<%- include ('../partials/footer'); %> 

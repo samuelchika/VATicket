@@ -8,6 +8,8 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const methodOverride = require("method-override");
 const ErrorHandler = require("./Error/ErrorHanlder");
+const MongoDBSession = require("connect-mongodb-session")(session);
+const mongoSanitize = require("express-mongo-sanitize");
 // model for mongoose
 const TicketUser = require("./models/ticketuser");
 // importing routes
@@ -26,6 +28,12 @@ async function main() {
 app.set("view engine", "ejs");
 //const path = require('path')
 app.use(methodOverride("_method"));
+// To remove data using these defaults:
+app.use(
+  mongoSanitize({
+    replaceWith: "_"
+  })
+); 
 app.use(express.static(path.join(path.resolve(), "public")));
 const port = process.env.PORT || 5000;
 // for form data
@@ -34,8 +42,22 @@ app.use(
     extended: true
   })
 );
+
+// mongodb session store
+const store = new MongoDBSession({
+  uri: process.env.MONGODB_URL,
+  secret: process.env.SESSION_SECRET,
+  touchAfter: 24 * 60 * 60
+});
+
+// check for error
+store.on("error", function (e) {
+  console.log("SESSION ERROR", e);
+});
+
 // session
 const sessionConfig = {
+  store,
   httpOnly: true,
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -72,7 +94,8 @@ app.get("/", (req, res) => {
 });
 // unknown pages redirect
 app.all("*", (req, res, next) => {
-  res.send(new ErrorHandler("Page Not found", 404));
+  //res.send();
+  next(new ErrorHandler("Page Not found", 404));
 });
 
 // Error handler
