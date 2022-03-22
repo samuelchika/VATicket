@@ -1,12 +1,12 @@
 <%- include ('../partials/header'); %>
 <section class="container">
   <section class="row" style="min-height: 90vh;">
-    <div class="  align-self-center">
+    <div class="  align-self-center my-2">
         <div class="col-6 offset-3">
             <%- include ('../partials/flash'); %>
         </div>        
         <%- include ('../partials/vaImage'); %>
-        <h2 class="h2 mb-3 text-center text-white">Search Ticket for History</h2>
+        <h3 class="h2 mb-3 text-center text-white">Search Ticket for History</h3>
         <form action="/tickets/searchHistory" method="POST" class="col-sm-8 offset-sm-2 col-md-4 offset-md-4">
             <div class="mb-3">
                 <input type="search" class="form-control" id="ticketNumber" name="ticketNumber" >
@@ -16,18 +16,41 @@
             </div>
         </form>
         <% if (locals.ticketHistory) { %>
+            <div class="row">
+                <div class="float-end">
+                        <a href="/tickets/<%= ticketHistory[0].ticketId._id %>" class="btn btn-primary">View Ticket</a>
+                </div>
+            </div>            
             <div class="mt-2 table-responsive">
-            <% ticketHistory.forEach((ticket => {
-                if(ticket.ticketId.summary) {
-                    ticket.ticketId.summary.forEach((summary) => {
-                        %>
-                        <%= summary %> 
-                        <%  
-                    })
-                }
-            })) %> 
-                
+                <table class="table table-light table-bordered px-2">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Ticket Number</th>
+                            <th scope="col">Assigned To</th>
+                            <th scope="col">Assigned By</th>
+                            <th scope="col">Date Assigned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                <% ticketHistory.forEach((ticket, index) => { %>
+                        <tr>
+                            <th scope="row"><%= index + 1 %></th>
+                            <td><%= ticket.ticketId.ticketNumber %></td>
+                            <td><%= ticket.assignedTo.username %></td>
+                            <td><%= ticket.assignedBy.username %>
+                                <% if (ticket.reclaimed == 1) { %>
+                                    <span class="badge bg-success">Reclaimed</span>
+                                <% } %>
+                            </td>
+                            <% let date = new Date(ticket.dateAssigned); %>
+                            <td><%= date.toDateString() %></td>
+                        </tr>
+            <% }) %> 
+                    </tbody>
+                </table>
             </div>
+            
         <% } %>
     </div>
   </section>

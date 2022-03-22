@@ -9,14 +9,14 @@
                         <a href="/logout" class="link-dark text-decoration-none"><i class="fas fa-power-off text-danger"></i></i>&nbsp; <strong>Logout</strong></a>
                         &emsp;
                     </span> &emsp;
-                    <span class=" border-end border-secondary">
-                        <a href="/" class="link-primary text-decoration-none"><i class="fas fa-home"></i>&nbsp; Home</a>
-                        &emsp;
-                    </span> &emsp;
                     <span class="border-end border-secondary">
                         <a href="/tickets" class="link-primary text-decoration-none">All RMA Tickets &nbsp;<i
                                 class="fas fa-list"></i></a> &emsp;
                     </span> &emsp; 
+                    <span class=" border-end border-secondary">
+                            <a href="/tickets/<%= ticket._id %>/history" class="link-secondary text-decoration-none fw-bold"><i class="fas fa-history text-info"></i>&nbsp; History</a>
+                            &emsp;
+                        </span> &emsp;
                     <span class="lead">
                         <i class="far fa-id-badge text-success "></i>&nbsp; <strong class="fw-bold"><%= currentUser.username %></strong>
                     </span>                    
@@ -120,7 +120,7 @@
                                 Summaries for this ticket
                             </div>
                         </div>
-                        <ul class="list-group list-group-flush">
+                        <ul class="list-group list-group-flush ff-dosis">
                             <% for( let index = (ticket.summary.length - 1); index >= 0 ; index-- ) { %>
                             <li class="list-group-item row m-0 p-2 bg-light rounded-top  border border-1 mt-2">
                                 <p class="fst-italic fw-light text-end text-mute ">
@@ -129,7 +129,7 @@
                                 </p>
                                 <figure class="text-justify">
                                     <blockquote class="blockquote">
-                                        <p class="p-1"><%= ticket.summary[index].summary %> </p>
+                                        <p class="p-1 ff-dosis"><%= ticket.summary[index].summary %> </p>
                                     </blockquote>
                                     <figcaption class="blockquote-footer">
                                         <cite title="<%= ticket.summary[index].author.username %>"><%= ticket.summary[index].author.username %></cite>
