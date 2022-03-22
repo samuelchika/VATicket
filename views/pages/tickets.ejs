@@ -4,19 +4,24 @@
     <div class="col-6 offset-3">
       <%- include ('../partials/flash'); %>
   </div>
-  <div class="text-center bg-white mb-3 p-3 rounded col-sm-12 col-md-6 offset-md-3">
-    <span class=" border-end border-secondary">
+  <div class="text-center bg-white mb-3 p-3 pb-1 rounded col-sm-12 col-md-6 offset-md-3">    
+    <form class="row g-3 align-items-center mx-auto" action="/tickets/search" method="POST">
+      <span class=" border-end border-secondary col-auto">
         <a href="/logout" class="link-dark text-decoration-none"><i class="fas fa-power-off text-danger"></i></i>&nbsp; <strong>Logout</strong></a>
         &emsp;
-    </span> &emsp;
-    <span class=" border-end border-secondary">
-        <a href="/" class="link-primary text-decoration-none"><i class="fas fa-home"></i>&nbsp; Home</a>
-        &emsp;
     </span> &emsp; 
-    <span class="lead">
+    <div class="col-auto">
+      <input type="search" name="ticketNumber" class="form-control" aria-describedby="ticketNumber" placeholder="Search Ticket">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" type="submit">Search </button>
+    </div> &emsp;
+    <span class="lead col-auto border-start border-secondary col-auto">
         <i class="far fa-id-badge text-success "></i>&nbsp; <strong class="fw-bold"><%= currentUser.username %></strong>
-    </span>                    
-</div>
+    </span>
+      
+    </form>                    
+  </div>
     
   <section class="row m-0" >
       <% if (tickets.length > 0) { %>
@@ -38,9 +43,9 @@
                     <br>
                     <h6 class="card-subtitle mb-2 text-muted"><span class="fs-3"><%= ticket.customer %></span> <%= ((ticket.warranty) && (ticket.warranty  == true)) ? "- Under Warranty" : "" %> <%= ((ticket.warranty) && (ticket.warranty  == false)) ? "- Out of Warranty" : "" %></h6>
           
-                    <figure class="text-end">
+                    <figure class="text-start">
                       <blockquote class="blockquote">
-                        <p class="mb-3" style="height: 6rem; overflow: hidden"><%= ticket.summary[ticket.summary.length - 1].summary %></p>
+                        <p class="mb-3 text-justify ff-dosis" style="height: 6rem; overflow: hidden"><%= ticket.summary[ticket.summary.length - 1].summary %></p>
                       </blockquote>
                       <figcaption class="blockquote-footer">
                         <cite title="Ticket Owner"><%= ticket.summary[ticket.summary.length - 1].author.username %></cite>

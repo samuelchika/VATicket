@@ -15,7 +15,7 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
         </form>
-        <% if (locals.ticketHistory) { %>
+        <% if (locals.ticketHistory && ticketHistory.length > 0) { %>
             <div class="row">
                 <div class="float-end">
                         <a href="/tickets/<%= ticketHistory[0].ticketId._id %>" class="btn btn-primary">View Ticket</a>
@@ -51,7 +51,9 @@
                 </table>
             </div>
             
-        <% } %>
+        <% } else {%>
+            <h2 class="fw-bold lead text-center">This ticket has not been assigned to anyone and has no History</h2>
+        <% } %> 
     </div>
   </section>
 </section>

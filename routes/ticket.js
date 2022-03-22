@@ -108,6 +108,23 @@ router.get(
   })
 );
 
+router.post("/search", isLoggedIn, catchAsyncError(async(req, res) => {
+  try {
+    const ticket = await Ticket.findOne(req.body);
+    if(ticket) {
+      res.redirect(`/tickets/${ticket._id}`);
+    } else {
+      req.flash("error", "Ticket don't exist");
+      res.redirect("/tickets")
+    }
+    console.log(req.body)
+  } catch (error) {
+    req.flash("error", error.message);
+    res.redirect("/tickets");
+  }
+  }) 
+);
+
 // VIEW TICKET HISTORY
 router.get(
   "/history",
@@ -138,6 +155,7 @@ router.post(
   })
 );
 
+// the history
 router.get(
   "/:id/history",
   isLoggedIn,
@@ -173,6 +191,7 @@ router.get(
 router.get(
   "/:id",
   isLoggedIn,
+  isAuthorized,
   catchAsyncError(async (req, res) => {
     const { id } = req.params;
     const ticket = await Ticket.findById(id)
