@@ -14,7 +14,7 @@ const validateUser = (req, res, next) => {
       var errorMessage = "Password Mismatch";
     } else if (message.includes("pattern")) {
       errorMessage =
-        "Password must be 8-16 characters containing uppercase, lowercase, numbers and special character";
+        "Password must be 8-16 characters containing uppercase, lowercase, numbers and NO SPECIAL CHARACTER";
     }
     req.flash("error", errorMessage);
     res.redirect("/identify");

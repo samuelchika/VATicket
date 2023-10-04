@@ -7,7 +7,7 @@
 
 body {
 	/* background: #f6f5f7; */
-    background-color: #00d1b2;
+    background-color: #5187a8;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -47,8 +47,8 @@ a {
 
 button {
 	border-radius: 20px;
-	border: 1px solid #00d1b2 ;
-	background-color: #00d1b2;
+	border: 1px solid #5187a8 ;
+	background-color: #5187a8;
 	color: #FFFFFF;
 	font-size: 12px;
 	font-weight: bold;
@@ -161,9 +161,9 @@ input {
 }
 
 .overlay {
-	background: #00d1b2;
-	background: -webkit-linear-gradient(to right, #00d1b2, #0b9e88);
-	background: linear-gradient(to right, #00d1b2, #0b9e88);
+	background: #5187a8;
+	background: -webkit-linear-gradient(to right, #1f8ed3, #1f8ed3);
+	background: linear-gradient(to right, #1f8ed3, #1f8ed3);
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: 0 0;
@@ -217,7 +217,7 @@ input {
 }
 
 .social-container a {
-	border: 1px solid #DDDDDD;
+	border: 1px solid #ffffff;
 	border-radius: 50%;
 	display: inline-flex;
 	justify-content: center;
@@ -228,7 +228,7 @@ input {
 }
 
 footer {
-    background-color: #222;
+    background-color: #ffffff;
     color: #fff;
     font-size: 14px;
     bottom: 0;

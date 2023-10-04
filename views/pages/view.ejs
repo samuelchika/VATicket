@@ -18,7 +18,7 @@
                             &emsp;
                         </span> &emsp;
                     <span class="lead">
-                        <i class="far fa-id-badge text-success "></i>&nbsp; <strong class="fw-bold"><%= currentUser.username %></strong>
+                        <i class="far fa-id-badge text-info "></i>&nbsp; <strong class="fw-bold"><%= currentUser.username %></strong>
                     </span>                    
                 </div>
                 <%- include ('../partials/flash'); %>
@@ -46,12 +46,12 @@
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Number of Devices: </div>
                             <div class="col-sm-6 col-md-4 border-start mt-2"><span
-                                    class="badge bg-success p-2"><%= ticket.numberDevices %></span></div>
+                                    class="badge bg-info p-2"><%= ticket.numberDevices %></span></div>
                         </div>
                         <div class="row border-bottom pb-2 pl-2">
                             <div class="col-sm-6 col-md-8 mt-2">Warranty</div>
                             <div class="col-sm-6 col-md-4 border-start mt-2"><span
-                                    class="badge bg-success p-2"><%= (ticket.warranty) ? "Under Warranty" : "Out of Warranty" %></span>
+                                    class="badge bg-info p-2"><%= (ticket.warranty) ? "Under Warranty" : "Out of Warranty" %></span>
                             </div>
                         </div>
                         
@@ -156,18 +156,18 @@
                 </div>
             </section>
         </div>
-        <div class="col-md-5 col-sm-12 mt-4">
+        <div class="col-md-5 col-sm-12 mt-4 text-white">
             <h2 class="fs-3 px-3">Update Ticket</h2>
             <form action="/tickets/<%= ticket._id %>/summary?_method=PUT" method="POST" class=" g-3 needs-validation align-self-center"
                 novalidate id="updateTicket">
                 <div class="row p-3">
                     <div class="col-12 text-sm-start">
-                        <label for="region" class="form-label fw-bold fs-5 text-dark">Provide a new update for this ticket</label>
+                        <label for="region" class="form-label fw-bold fs-5 text-white">Provide a new update for this ticket</label>
                     </div>
                     <div class="col-12">
                         <textarea name="summary" id="summary" cols="30" rows="5" class="form-control"
                             required></textarea>
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback ">
                             Please provide a summary for this update.
                         </div>
                     </div>

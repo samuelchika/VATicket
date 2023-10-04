@@ -25,7 +25,7 @@ const extension = (joi) => ({
     checkPasswordLenghth:{
       validate(value, helpers) {
         const length = value.length;
-        if((length < 8) && (length <= 16)) 
+        if((length < 8) && (length >= 16)) 
           return helpers.error("string.passwordError", { value });
         
         return value
