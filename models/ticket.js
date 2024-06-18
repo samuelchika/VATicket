@@ -10,9 +10,9 @@ const TicketSchema = new Schema(
       required: true,
       validate: {
         validator: function (num) {
-          return num.toString().length >= 6;
+          return num.toString().length >= 5;
         },
-        message: "Ticket number length must be greater than or equals 6 digits"
+        message: "Ticket number length must be greater than or equals 5 digits: 00012345"
       }
     },
     customer: {

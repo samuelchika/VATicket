@@ -44,7 +44,7 @@ const extension = (joi) => ({
 const Joi = BaseJoi.extend(extension);
 
 module.exports.ticketValidation = Joi.object({
-  ticketNumber: Joi.string().required().escapeHTML().min(6).max(8).verifyTicketNumber(),
+  ticketNumber: Joi.string().required().escapeHTML().min(6).max(11),
   customer: Joi.string().required().escapeHTML(),
   numberDevices: Joi.number(),
   request: Joi.string().escapeHTML(),
